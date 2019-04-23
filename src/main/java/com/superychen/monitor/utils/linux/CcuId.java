@@ -25,8 +25,4 @@ public class CcuId extends LinuxCommand<String> {
         return null;
     }
 
-//    public static void main(String[] args) {
-//        log.info(new CcuId().exec());
-//    }
-
 }

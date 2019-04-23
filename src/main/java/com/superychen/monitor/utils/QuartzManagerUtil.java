@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.util.Date;
+
 /**
  * 定时任务管理器
  */
@@ -21,10 +23,24 @@ public class QuartzManagerUtil {
      * @param cron   cron表达式
      */
     public static boolean addJob(String job, String group, Class<? extends Job> jobCls, String cron) {
+        return addJob(job, group, jobCls, cron, null);
+    }
+
+    /**
+     * 添加定时任务
+     *
+     * @param job    任务名称
+     * @param group  组名称
+     * @param jobCls 任务类
+     * @param cron   cron表达式
+     * @param delay  延迟执行毫秒数,为null或小于等于0时立即执行
+     */
+    public static boolean addJob(String job, String group, Class<? extends Job> jobCls, String cron, Long delay) {
         try {
             JobDetail jobDetail = JobBuilder.newJob().ofType(jobCls).withIdentity(job, group).build();
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).withMisfireHandlingInstructionDoNothing();
-            Trigger trigger = TriggerBuilder.newTrigger().withIdentity(job, group).startNow().withSchedule(scheduleBuilder).build();
+            TriggerBuilder<CronTrigger> tb = TriggerBuilder.newTrigger().withIdentity(job, group).withSchedule(scheduleBuilder);
+            Trigger trigger = delay == null || delay <= 0 ? tb.startNow().build() : tb.startAt(new Date(System.currentTimeMillis() + delay)).build();
             Scheduler scheduler = schedulerFactory.getScheduler();
             scheduler.start();
             scheduler.scheduleJob(jobDetail, trigger);

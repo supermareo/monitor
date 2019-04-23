@@ -14,7 +14,7 @@ public class CollectService {
     //缓存管理器
     private CacheManager cacheManager = CacheManager.getInstance();
 
-    private CcuId ccuId = new CcuId();
+    private String ccuId = ConfigManagerService.CCU_ID;
     private Df df = new Df("/");
     private EthernetState ethernetState = new EthernetState();
     private MemInfo memInfo = new MemInfo();
@@ -24,7 +24,6 @@ public class CollectService {
     public void collect() {
         long now = System.currentTimeMillis();
         //--收集系统信息
-        String ccuId = this.ccuId.exec();
         Df.StorageResult df = this.df.exec();
         String ethernetState = this.ethernetState.exec();
         MemInfo.MemoryResult memInfo = this.memInfo.exec();

@@ -1,13 +1,19 @@
 package com.superychen.monitor.service;
 
+import com.google.gson.reflect.TypeToken;
 import com.superychen.monitor.jobs.CleanCacheJob;
 import com.superychen.monitor.jobs.CollectJob;
+import com.superychen.monitor.jobs.FetchConfigJob;
 import com.superychen.monitor.jobs.UploadJob;
+import com.superychen.monitor.model.CommonResp;
 import com.superychen.monitor.model.MonitorConfig;
 import com.superychen.monitor.utils.*;
 import com.superychen.monitor.utils.linux.CcuId;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 负责整个流程管理
@@ -22,8 +28,14 @@ import lombok.extern.slf4j.Slf4j;
 public class ConfigManagerService {
 
     private static final ConfigManagerService instance;
+    private static final String UPLOAD_TOKEN = PropertiesUtil.getProperty("token.upload");
+    private static final Map<String, String> HEADER = new HashMap<String, String>() {
+        {
+            put("token", UPLOAD_TOKEN);
+        }
+    };
     //主机号
-    private static final String CCU_ID = new CcuId().exec();
+    public static final String CCU_ID = "CCU_" + new CcuId().exec();
     //如果这个文件不存在,启动报错,正好
     private static final String CONFIG_PATH = ConfigManagerService.class.getClassLoader().getResource("config.json").getPath();
     //配置信息获取地址
@@ -48,10 +60,13 @@ public class ConfigManagerService {
         parseConfig(this.monitorConfig, true);
         //添加定时清除任务,每2分钟执行一次
         QuartzManagerUtil.addJob("clean", "monitor", CleanCacheJob.class, "0 0/2 * * * ?");
+        //添加定时获取配置信息任务,每2分钟执行一次,启动延迟2分钟执行
+        QuartzManagerUtil.addJob("config", "monitor", FetchConfigJob.class, "0 0/2 * * * ?", 1000 * 60 * 2L);
         log.info("config manager complete");
     }
 
     private void parseConfig(MonitorConfig monitorConfig, boolean firstFlag) {
+        log.info("parseConfig {},{}", monitorConfig, firstFlag);
         //如果配置文件没有改变,且不是首次启动
         //因为首次启动
         if (!this.configModified && !firstFlag) {
@@ -89,11 +104,17 @@ public class ConfigManagerService {
     private MonitorConfig loadConfig() {
         this.configModified = false;
         //调接口获取配置信息
-        MonitorConfig configFromRemote = OkHttpClientUtil.get(URL_CONFIG.replace("#CCU_ID", CCU_ID), MonitorConfig.class);
+        CommonResp<MonitorConfig> remoteResp = OkHttpClientUtil.get(URL_CONFIG.replace("#CCU_ID", CCU_ID), HEADER, new TypeToken<CommonResp<MonitorConfig>>() {
+        }.getType());
         //读取本地配置信息
         MonitorConfig configFromLocal = JsonUtil.fromJson(FileUtil.read(CONFIG_PATH), MonitorConfig.class);
         //比较是否相同
         //如果接口返回空
+        if (remoteResp == null || remoteResp.getCode() != 200 || remoteResp.getData() == null) {
+            log.info("load config from remote empty, not modified");
+            return configFromLocal;
+        }
+        MonitorConfig configFromRemote = remoteResp.getData();
         if (configFromRemote == null) {
             log.info("load config from remote empty, not modified");
             return configFromLocal;

@@ -107,9 +107,13 @@ public class OkHttpClientUtil {
      * @param <T>     返回数据类型泛型
      * @return 返回数据, 如果请求失败或无返回, 返回null
      */
-    public static <T> T get(String url, Type typeOfT) {
+    public static <T> T get(String url, Map<String, String> headers, Type typeOfT) {
         try {
-            Response response = getUnsafeOkHttpClient().newCall(new Request.Builder().url(url).get().build()).execute();
+            Request.Builder rb = new Request.Builder().url(url).get();
+            if (headers != null) {
+                headers.forEach(rb::addHeader);
+            }
+            Response response = getUnsafeOkHttpClient().newCall(rb.build()).execute();
             return processResp(response, typeOfT);
         } catch (Exception e) {
             return null;
