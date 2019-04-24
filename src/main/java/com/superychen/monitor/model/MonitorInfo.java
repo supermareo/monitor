@@ -30,6 +30,9 @@ public class MonitorInfo {
     @SerializedName("ma")
     private long memAvailable;
     //--CPU信息
+    //CPU核心数目
+    @SerializedName("co")
+    private int core;
     //最近5分钟负载
     @SerializedName("cla5")
     private double cpuLoadAvg5;

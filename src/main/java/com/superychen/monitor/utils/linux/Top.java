@@ -2,6 +2,7 @@ package com.superychen.monitor.utils.linux;
 
 import com.superychen.monitor.model.Base;
 import com.superychen.monitor.model.LinuxExecResult;
+import com.superychen.monitor.utils.PropertiesUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +20,16 @@ import java.util.regex.Pattern;
 @Slf4j
 public class Top extends LinuxCommand<Top.TopResult> {
 
+    //top - 14:49:56 up 5 days, 20:49,  4 users,  load average: 0.98, 0.88, 0.8
     //top - 17:14:34 up  1:54,  1 user,  load average: 0.46, 0.78, 0.68
-    private static final Pattern PATTERN_SUMMARY = Pattern.compile("top\\s+-\\s+(\\S+)\\s+up\\s+(\\d+:\\d+),\\s+(\\d+)\\s+user,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
-
+    //private static final Pattern PATTERN = Pattern.compile("top\\s+-\\s+([0-9:]+)\\s+up\\s+([\\d+ days,]*\\s+[0-9:]+),\\s+(\\d+)\\s+user[s]*,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
+    //private static final Pattern PATTERN_SUMMARY = Pattern.compile("top\\s+-\\s+(\\S+)\\s+up\\s+(\\d+:\\d+),\\s+(\\d+)\\s+user,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
+    private static final Pattern PATTERN_SUMMARY = Pattern.compile(PropertiesUtil.getProperty("REGEX_TOP_SUMMARY"));
     //任务: 310 total,   1 running, 234 sleeping,   0 stopped,   0 zombie
-    private static final Pattern PATTERN_TASK = Pattern.compile("任务:\\s+(\\d+)\\s+total,\\s+(\\d+)\\s+running,\\s+(\\d+)\\s+sleeping," +
-            "\\s+(\\d+)\\s+stopped,\\s+(\\d+)\\s+zombie");
-
+    //Tasks: 178 total,   1 running, 177 sleeping,   0 stopped,   0 zombie
+    //private static final Pattern PATTERN_TASK = Pattern.compile("任务:\\s+(\\d+)\\s+total,\\s+(\\d+)\\s+running,\\s+(\\d+)\\s+sleeping," +
+    //        "\\s+(\\d+)\\s+stopped,\\s+(\\d+)\\s+zombie");
+    private static final Pattern PATTERN_TASK = Pattern.compile(PropertiesUtil.getProperty("REGEX_TOP_TASK"));
     //%Cpu(s):  9.5 us,  3.8 sy,  0.4 ni, 83.7 id,  2.2 wa,  0.0 hi,  0.3 si,  0.0 st
     private static final Pattern PATTERN_CPU = Pattern.compile("%Cpu\\(s\\):\\s+([0-9.]+)\\s+us,\\s+([0-9.]+)\\s+sy,\\s+([0-9.]+)\\s+ni," +
             "\\s+([0-9.]+)\\s+id,\\s+([0-9.]+)\\s+wa,\\s+([0-9.]+)\\s+hi,\\s+([0-9.]+)\\s+si,\\s+([0-9.]+)\\s+st");
@@ -407,11 +411,11 @@ public class Top extends LinuxCommand<Top.TopResult> {
 
             Matcher tMatcher = PATTERN_TASK.matcher(resp);
             if (tMatcher.find()) {
-                int total = Integer.parseInt(tMatcher.group(1));
-                int running = Integer.parseInt(tMatcher.group(2));
-                int sleeping = Integer.parseInt(tMatcher.group(3));
-                int stopped = Integer.parseInt(tMatcher.group(4));
-                int zombie = Integer.parseInt(tMatcher.group(5));
+                int total = Integer.parseInt(tMatcher.group(2));
+                int running = Integer.parseInt(tMatcher.group(3));
+                int sleeping = Integer.parseInt(tMatcher.group(4));
+                int stopped = Integer.parseInt(tMatcher.group(5));
+                int zombie = Integer.parseInt(tMatcher.group(6));
                 topResult.setTask(new Task(total, running, sleeping, stopped, zombie));
             }
 

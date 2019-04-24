@@ -26,9 +26,9 @@ public class EthernetState extends LinuxCommand<String> {
         return null;
     }
 
-    public static void main(String[] args) {
-        String exec = new EthernetState().exec();
-        System.out.println("->" + exec + "->");
-    }
+//    public static void main(String[] args) {
+//        String exec = new EthernetState().exec();
+//        System.out.println("->" + exec + "->");
+//    }
 
 }

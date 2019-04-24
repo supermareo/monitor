@@ -66,8 +66,8 @@ public class Df extends LinuxCommand<Df.StorageResult> {
         private String mountPath;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Df("/").exec());
-    }
+//    public static void main(String[] args) {
+//        System.out.println(new Df("/").exec());
+//    }
 
 }

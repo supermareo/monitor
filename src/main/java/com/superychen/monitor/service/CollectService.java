@@ -19,6 +19,7 @@ public class CollectService {
     private EthernetState ethernetState = new EthernetState();
     private MemInfo memInfo = new MemInfo();
     private Ping ping = new Ping();
+    private CpuInfo cpuInfo = new CpuInfo();
     private Top top = new Top();
 
     public void collect() {
@@ -29,6 +30,7 @@ public class CollectService {
         MemInfo.MemoryResult memInfo = this.memInfo.exec();
         Ping.PingResult ping = this.ping.exec();
         Top.TopResult top = this.top.exec();
+        Integer cpuCore = this.cpuInfo.exec();
         //--构造对象
         MonitorInfo monitorInfo = new MonitorInfo();
         //时间
@@ -41,6 +43,7 @@ public class CollectService {
         monitorInfo.setMemAvailable(memInfo.getAvailable());
         monitorInfo.setMemCached(memInfo.getCached());
         //cpu信息
+        monitorInfo.setCore(cpuCore);
         Top.Cpu cpu = top.getCpu();
         monitorInfo.setCpuLoadAvg5(cpu.getLoadAverage5());
         monitorInfo.setCpuLoadAvg10(cpu.getLoadAverage10());
