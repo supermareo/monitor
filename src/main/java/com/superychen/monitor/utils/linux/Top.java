@@ -20,10 +20,17 @@ import java.util.regex.Pattern;
 @Slf4j
 public class Top extends LinuxCommand<Top.TopResult> {
 
+//    private static final Pattern PATTERN = Pattern.compile("top\\s+-\\s+([0-9:]+)\\s+up\\s+[\\d+ days,]*([\\d+ min,]*|[0-9:]+),\\s+(\\d+)\\s+user[s]*,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
+
+    //up 8 min,
+    //up 8:12,
+    //up 3 days, 8 min,
+    //up 3 days, 8:12,
+    //private static final Pattern PATTERN = Pattern.compile("up\\s+([\\d+\\s+days,\\s+]*[\\d+\\s+min,]*[0-9:,]*)");
     //top - 14:49:56 up 5 days, 20:49,  4 users,  load average: 0.98, 0.88, 0.8
     //top - 17:14:34 up  1:54,  1 user,  load average: 0.46, 0.78, 0.68
     //private static final Pattern PATTERN = Pattern.compile("top\\s+-\\s+([0-9:]+)\\s+up\\s+([\\d+ days,]*\\s+[0-9:]+),\\s+(\\d+)\\s+user[s]*,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
-    //private static final Pattern PATTERN_SUMMARY = Pattern.compile("top\\s+-\\s+(\\S+)\\s+up\\s+(\\d+:\\d+),\\s+(\\d+)\\s+user,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
+    //private static final Pattern PATTERN_SUMMARY = Pattern.compile("top\\s+-\\s+([0-9:]+)\\s+up\\s+([\\d+\\s+days,\\s+]*[\\d+\\s+min,]*[0-9:,]*)\\s+(\\d+)\\s+user[s]*,\\s+load average:\\s+([0-9.]+),\\s+([0-9.]+),\\s+([0-9.]+)");
     private static final Pattern PATTERN_SUMMARY = Pattern.compile(PropertiesUtil.getProperty("REGEX_TOP_SUMMARY"));
     //任务: 310 total,   1 running, 234 sleeping,   0 stopped,   0 zombie
     //Tasks: 178 total,   1 running, 177 sleeping,   0 stopped,   0 zombie

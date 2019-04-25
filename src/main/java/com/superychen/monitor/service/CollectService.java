@@ -43,7 +43,7 @@ public class CollectService {
         monitorInfo.setMemAvailable(memInfo.getAvailable());
         monitorInfo.setMemCached(memInfo.getCached());
         //cpu信息
-        monitorInfo.setCore(cpuCore);
+        monitorInfo.setCpuCore(cpuCore);
         Top.Cpu cpu = top.getCpu();
         monitorInfo.setCpuLoadAvg5(cpu.getLoadAverage5());
         monitorInfo.setCpuLoadAvg10(cpu.getLoadAverage10());
